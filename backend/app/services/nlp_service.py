@@ -106,6 +106,12 @@ SCAM_CATEGORIES = {
         "title": "Fake Charity / Donation Scam",
         "description": "Fraudsters use fake emergencies, charities, or fundraisers to collect money through deceptive donation requests.",
         "danger_level": 85
+    },
+    "FINANCIAL_CREDENTIAL_THEFT": {
+        "pattern": r'give me.*(otp|cvv|card number|credit card|debit card)|send me.*(otp|cvv|card number|credit card|debit card)|share.*(otp|cvv|card details|card number|password|pin)|provide.*(otp|cvv|card details|card number|password|pin)|tell me.*(otp|cvv|card number|pin)',
+        "title": "Financial Credential Theft",
+        "description": "Requests for OTPs, CVVs, card numbers, PINs, passwords, or other sensitive financial credentials can enable unauthorized access or fraudulent transactions.",
+        "danger_level": 98
     }
 }
 def extract_entities(text: str) -> Dict[str, List[str]]:

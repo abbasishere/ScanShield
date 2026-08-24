@@ -10,6 +10,7 @@ from app.services.url_service import analyze_url_intelligence
 from app.services.sebi_service import verify_sebi_registration
 from app.services.ocr_service import extract_text_from_image_base64
 from app.services.web_search_service import search_web_reputation
+from app.services.gemini_service import extract_scam_signals
 
 def run_evidence_fusion_pipeline(request: ScanRequest) -> ScanResponse:
     """
@@ -19,18 +20,41 @@ def run_evidence_fusion_pipeline(request: ScanRequest) -> ScanResponse:
     input_text = request.text or ""
     input_url = request.url or ""
     image_base64 = request.image_base64 or ""
+    # 0. Gemini Pre-Analysis / Signal Extraction
+    gemini_res = extract_scam_signals(  
+       f"{input_text} {input_url}".strip()
+)
+    print("GEMINI RESULT:", gemini_res)
+    
 
     # 1. Image OCR Extraction & Brand Identification
     ocr_res = extract_text_from_image_base64(image_base64)
     ocr_text = ocr_res.get("ocrText")
     extracted_brand = ocr_res.get("extractedBrand")
 
-    combined_text = f"{input_text} {ocr_text or ''} {input_url}".strip()
+    gemini_context = ""
+
+    if gemini_res:
+     gemini_context = (
+        f"Brand: {gemini_res.get('brand') or ''}. "
+        f"Intent: {gemini_res.get('intent') or ''}. "
+        f"Urgency: {gemini_res.get('urgency', False)}. "
+        f"Threat: {gemini_res.get('threat') or ''}. "
+        f"Requested credentials: "
+        f"{', '.join(gemini_res.get('requested_credentials', []))}. "
+        f"Requested action: {gemini_res.get('requested_action') or ''}. "
+        f"Payment request: {gemini_res.get('payment_request', False)}. "
+        f"Payment method: {gemini_res.get('payment_method') or ''}."
+    )
+    combined_text = (
+    f"{input_text} {ocr_text or ''} {input_url} {gemini_context}"
+).strip()
 
     # 2. NLP Analysis & Category Classification
     nlp_res = analyze_nlp_text(combined_text)
+    print("NLP RESULT:", nlp_res)
     nlp_score = nlp_res["score"]
-    detected_cat = nlp_res.get("detectedCategory")
+    detected_cat = (nlp_res.get("detectedCategory") or "").strip().upper()
     cat_title = nlp_res.get("categoryTitle")
     extracted_entities = nlp_res.get("extractedEntities", {})
 
@@ -84,12 +108,22 @@ def run_evidence_fusion_pipeline(request: ScanRequest) -> ScanResponse:
     weighted_sum = sum(w * s for w, s in zip(weights, scores))
     final_score = round(weighted_sum / sum(weights))
 
+    # Critical scam-category override
+    if detected_cat in {"ELECTRICITY_BILL","DIGITAL_ARREST_COURIER", 
+                    "UPI_QR_REFUND","PART_TIME_JOB","INVESTMENT_FOREX_TELEGRAM","LOAN_APP_EXTORTION","BANK_IMPERSONATION",
+                    "PHISHING","SIM_DEACTIVATION" "LOTTERY_PRIZE", 
+                    "COURIER_CUSTOMS", "CRYPTO_SCAM", "ROMANCE_SCAM",
+                    "CHARITY_SCAM", "FINANCIAL_CREDENTIAL_THEFT",
+}:
+     final_score = max(final_score, 88.0)
+
     # Overrides for definitive scam indicators
     if detected_cat in ["ELECTRICITY_BILL","DIGITAL_ARREST_COURIER","UPI_QR_REFUND","PART_TIME_JOB",
                         "INVESTMENT_FOREX_TELEGRAM","LOAN_APP_EXTORTION","BANK_IMPERSONATION","PHISHING",
                         "SIM_DEACTIVATION","LOTTERY_PRIZE","COURIER_CUSTOMS", "CRYPTO_SCAM","ROMANCE_SCAM",
-                        "CHARITY_SCAM"
+                        "CHARITY_SCAM","FINANCIAL_CREDENTIAL_THEFT",
 ]:
+        print("FINAL SCORE BEFORE CLAMP:", final_score)
         final_score = max(final_score, 88.0)
     if url_info and url_info.get("isTyposquatting"):
         final_score = max(final_score, 90.0)
