@@ -49,7 +49,31 @@ export const InputBar: React.FC<InputBarProps> = ({
       reader.readAsDataURL(file);
     }
   };
+  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+  const items = e.clipboardData.items;
 
+  for (const item of items) {
+    if (item.type.startsWith('image/')) {
+      e.preventDefault();
+
+      const file = item.getAsFile();
+
+      if (!file) return;
+
+      setFileName('Pasted screenshot.png');
+
+      const reader = new FileReader();
+
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+
+      reader.readAsDataURL(file);
+
+      return;
+    }
+  }
+};
   const handleRemoveImage = () => {
     setImagePreview(null);
     setFileName(null);
@@ -171,6 +195,7 @@ export const InputBar: React.FC<InputBarProps> = ({
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               onKeyDown={handleKeyDown}
+              onPaste={handlePaste}
               placeholder="Paste promotion text, link (e.g. https://...), WhatsApp message or upload screenshot..."
               rows={1}
               className="flex-1 resize-none bg-transparent px-1 py-1.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none max-h-40 font-sans"
