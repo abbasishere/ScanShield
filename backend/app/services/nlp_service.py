@@ -45,14 +45,69 @@ SCAM_CATEGORIES = {
         "description": "Scammers trick victims into scanning QR codes or typing their UPI PIN to 'receive' money or refunds (entering a PIN ALWAYS debits your account).",
         "danger_level": 93
     },
-    "LOTTERY_KYC_BLOCKED": {
+        "LOTTERY_KYC_BLOCKED": {
         "pattern": r'kbc|lottery winner|account blocked|pan link|update kyc|sim blocked|card de-activated',
         "title": "Phishing KYC / Lottery Scam",
         "description": "Fake notifications claiming your bank or SIM is blocked unless you click a link and enter personal credentials or OTPs.",
         "danger_level": 88
+    },
+
+    "BANK_IMPERSONATION": {
+        "pattern": r'sbi|hdfc|icici|axis bank|bank account|account will be blocked|account suspended|bank officer|bank manager|verify your account|otp|atm card blocked',
+        "title": "Bank Impersonation / Account Fraud",
+        "description": "Scammers impersonate banks or bank officials to create urgency and trick victims into sharing OTPs, PINs, passwords, or transferring money.",
+        "danger_level": 94
+    },
+
+    "PHISHING": {
+        "pattern": r'click (this )?link|verify your account|login immediately|confirm your identity|enter otp|enter password|enter pin|update your details|security alert|suspicious login',
+        "title": "Phishing / Credential Theft",
+        "description": "Fraudulent messages attempt to steal passwords, OTPs, PINs, or personal information through fake verification requests or links.",
+        "danger_level": 93
+    },
+
+    "SIM_DEACTIVATION": {
+        "pattern": r'sim.*(blocked|deactivated|suspended)|mobile number.*(blocked|deactivated)|sim kyc|re-?activate.*sim|telecom.*kyc',
+        "title": "SIM Deactivation / KYC Scam",
+        "description": "Scammers falsely claim that a mobile number or SIM will be deactivated unless the victim completes a fake KYC process or shares sensitive information.",
+        "danger_level": 90
+    },
+
+    "LOTTERY_PRIZE": {
+        "pattern": r'you (have )?won|congratulations.*(winner|prize)|lottery.*(winner|prize)|prize money|claim your prize|processing fee.*prize|tax.*prize|jackpot',
+        "title": "Fake Lottery / Prize Scam",
+        "description": "Scammers falsely claim that victims have won money or a prize and then demand taxes, processing fees, or personal information.",
+        "danger_level": 92
+    },
+
+    "COURIER_CUSTOMS": {
+        "pattern": r'parcel.*(customs|illegal|seized)|customs.*(fee|payment)|courier.*(fee|payment)|package.*(seized|illegal)|fedex|dhl|customs officer',
+        "title": "Courier / Customs Impersonation Scam",
+        "description": "Scammers impersonate courier or customs officials and demand money or personal information over an alleged illegal or seized parcel.",
+        "danger_level": 96
+    },
+
+    "CRYPTO_SCAM": {
+        "pattern": r'crypto.*(guaranteed|profit|investment)|bitcoin.*(profit|investment)|ethereum.*(profit|investment)|crypto mining|double your crypto|crypto giveaway|wallet.*(connect|verify)',
+        "title": "Cryptocurrency Investment Scam",
+        "description": "Fraudulent cryptocurrency schemes promise unrealistic profits, fake giveaways, mining returns, or request access to cryptocurrency wallets.",
+        "danger_level": 94
+    },
+
+    "ROMANCE_SCAM": {
+        "pattern": r'online (boyfriend|girlfriend|relationship)|dating.*(money|transfer)|send money.*(emergency|hospital|ticket)|emergency.*(money|transfer)|gift.*customs fee',
+        "title": "Romance / Relationship Scam",
+        "description": "Scammers build online relationships and eventually invent emergencies or fees to pressure victims into sending money.",
+        "danger_level": 88
+    },
+
+    "CHARITY_SCAM": {
+        "pattern": r'donate.*(urgent|immediately)|charity.*(donation|payment)|relief fund|medical fundraiser|emergency donation|help.*(victims|children).*donation',
+        "title": "Fake Charity / Donation Scam",
+        "description": "Fraudsters use fake emergencies, charities, or fundraisers to collect money through deceptive donation requests.",
+        "danger_level": 85
     }
 }
-
 def extract_entities(text: str) -> Dict[str, List[str]]:
     """Extracts phone numbers, UPI IDs, URLs, and currency amounts."""
     entities: Dict[str, List[str]] = {
@@ -115,13 +170,15 @@ def analyze_nlp_text(text: str) -> Dict[str, Any]:
     score = 15.0
 
     # 1. Match specific scam categories
+    matched_categories = []
     for cat_key, cat_data in SCAM_CATEGORIES.items():
         if re.search(cat_data["pattern"], text_lower):
-            detected_category_key = cat_key
-            category_info = cat_data
+            matched_categories.append((cat_key, cat_data))
             score = max(score, float(cat_data["danger_level"]))
             triggers.append(f"Identified Pattern: {cat_data['title']}")
-            break
+    if matched_categories:
+        detected_category_key = matched_categories[0][0]
+        category_info = matched_categories[0][1]        
 
     # 2. General manipulation triggers
     if re.search(r'hurry|limited slots|today only|act fast|immediately|urgent|within \d+ hours|tonight', text_lower):

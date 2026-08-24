@@ -85,7 +85,11 @@ def run_evidence_fusion_pipeline(request: ScanRequest) -> ScanResponse:
     final_score = round(weighted_sum / sum(weights))
 
     # Overrides for definitive scam indicators
-    if detected_cat in ["ELECTRICITY_BILL", "DIGITAL_ARREST_COURIER", "UPI_QR_REFUND", "PART_TIME_JOB"]:
+    if detected_cat in ["ELECTRICITY_BILL","DIGITAL_ARREST_COURIER","UPI_QR_REFUND","PART_TIME_JOB",
+                        "INVESTMENT_FOREX_TELEGRAM","LOAN_APP_EXTORTION","BANK_IMPERSONATION","PHISHING",
+                        "SIM_DEACTIVATION","LOTTERY_PRIZE","COURIER_CUSTOMS", "CRYPTO_SCAM","ROMANCE_SCAM",
+                        "CHARITY_SCAM"
+]:
         final_score = max(final_score, 88.0)
     if url_info and url_info.get("isTyposquatting"):
         final_score = max(final_score, 90.0)
@@ -135,7 +139,7 @@ def run_evidence_fusion_pipeline(request: ScanRequest) -> ScanResponse:
             if web_rep_res.get("hasNegativeReports"):
                 reasons.append(f"Web Reputation Warning: {web_rep_res['detail']}")
             if nlp_res.get("triggers"):
-                reasons.append(nlp_res["triggers"][0])
+                reasons.extend(nlp_res["triggers"][:4])
 
         if upis:
             reasons.append(f"Direct UPI Handle: Asks for payments to personal handle ({', '.join(upis)}).")

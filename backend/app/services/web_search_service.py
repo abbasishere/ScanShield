@@ -95,9 +95,11 @@ def search_web_reputation(query_entity: str) -> Dict[str, Any]:
                             score += 25.0
                             snippets.append(s)
                         elif len(clean_query) <= 3:
-                            has_negative_reports = True
-                            score += 25.0
                             snippets.append(s)
+
+                            if any(x in s.lower() for x in ["official warning", "fraud alert", "scam alert", "cyber crime", "police warning"]):
+                                 has_negative_reports = True
+                                 score += 25.0
 
                 score = min(score, 92.0)
     except Exception as e:
