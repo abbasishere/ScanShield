@@ -1,164 +1,128 @@
-ScamShield India — Project Summary
+# ScamShield India
 
-ScamShield India is an AI-powered platform designed to detect and prevent fake investment and trading scams before users lose money.
+> An AI-powered platform for detecting and explaining investment scams before users lose money.
 
-Users can submit a URL, investment message, social-media post, screenshot, or webpage. The system analyzes it using multiple independent signals:
+## The Problem
 
-NLP analysis — detects scam-like language, guaranteed-return claims, urgency, and manipulation.
+Investment scams are becoming increasingly convincing. Fake advisers,
+trading platforms, guaranteed-return schemes, and impersonation scams can
+look legitimate to someone who does not know what to verify.
 
-URL/domain analysis — identifies suspicious domains, redirects, and other risky link characteristics.
+ScamShield India was built around a simple question:
 
-Web intelligence — searches for reputation information and similar scam reports.
+**"Can I trust this investment?"**
 
-Official entity verification — checks claimed advisers, brokers, companies, and platforms against relevant official sources such as SEBI.
+## What ScamShield Does
 
-Scam intelligence database — compares domains, accounts, identifiers, and patterns against known scam indicators.
+ScamShield analyzes suspicious investment content using multiple sources
+of evidence.
 
-OCR/image analysis — extracts useful information from screenshots or visual content.
+Users can submit:
 
+- URLs
+- Investment messages
+- Social media content
+- Screenshots
+- Web pages
 
-These signals are combined through an evidence-fusion and risk-scoring engine rather than simply averaging AI confidence scores. The system produces a 0–100 risk score and classifies the content as Low Risk, Suspicious, or High Risk.
+The system evaluates the submitted content through several detection layers:
 
-The detected evidence is then passed to Gemini AI, which converts the technical findings into a simple explanation for the user.
+### NLP Analysis
+Identifies scam-related language, guaranteed-return claims, urgency,
+and other manipulation patterns.
 
-For example:
+### URL & Domain Analysis
+Examines suspicious links, domains, redirects, and other URL characteristics.
 
-> 🔴 HIGH RISK — 91/100
-❌ Adviser not verified
-⚠️ Guaranteed-return claim
-⚠️ Suspicious trading domain
-❌ Matches a known scam pattern
+### Web Intelligence
+Looks for reputation information and reports associated with the submitted
+content.
 
+### Official Verification
+Checks claimed advisers, brokers, companies, and platforms against relevant
+official sources.
 
+### Scam Intelligence
+Compares extracted identifiers and patterns against known scam indicators.
 
-The user is then guided toward safe actions such as Verify, Avoid, or Report.
+### OCR & Image Analysis
+Extracts relevant information from screenshots and other visual content.
 
-Key Innovation
+## Risk Assessment
 
-The project's main differentiator is evidence-based, proactive protection:
+Rather than relying on a single AI prediction, ScamShield combines evidence
+from multiple detection layers to produce a risk score from **0–100**.
 
-> Detect → Verify → Fuse Evidence → Explain → Protect
+The result is classified as:
 
+- 🟢 Low Risk
+- 🟡 Suspicious
+- 🔴 High Risk
 
-
-A browser extension can warn users while they encounter suspicious investment content instead of requiring them to manually investigate every opportunity.
-
-A further intelligence layer can correlate repeated indicators—such as domains, phone numbers, UPI IDs, accounts, messages, and scam patterns—to identify related scam campaigns.
-
-In one line:
-
-> ScamShield India helps users answer “Can I trust this investment?” by combining AI detection, official verification, web intelligence, and explainable evidence before they invest.
-
-Sure. For your project, the formula we discussed is **weighted evidence fusion**. The idea is that every detection method provides a signal, but **not every signal should have equal importance**.
-
-### Weighted Risk Score
-
-[
-\boxed{
-R=\frac{\sum_{i=1}^{n} w_i s_i}{\sum_{i=1}^{n}w_i}
-}
-]
-
-Where:
-
-* **(R)** = final risk score
-* **(s_i)** = score produced by the (i^{th}) detection method
-* **(w_i)** = reliability/importance weight of that method
-* **(n)** = number of detection signals
-
-For ScamShield India, the signals could be:
-
-| Detection Signal          | What it evaluates                               |
-| ------------------------- | ----------------------------------------------- |
-| **NLP Score**             | Scam-like language and manipulation             |
-| **URL Score**             | Suspicious domain/link characteristics          |
-| **Web Reputation**        | Reports and reputation found online             |
-| **Official Verification** | Whether claimed entities can be verified        |
-| **Scam Pattern Score**    | Similarity to known scam patterns               |
-| **OCR/Image Score**       | Suspicious information contained in screenshots |
+The system also presents the evidence behind the result so that users can
+understand *why* something was flagged.
 
 ### Example
 
-Suppose the system gets:
+**🔴 HIGH RISK — 91/100**
 
-```text
-NLP                  85
-URL Analysis         75
-Web Reputation       60
-Official Verification 95
-Scam Pattern         90
-```
+- ❌ Adviser could not be verified
+- ⚠️ Guaranteed-return claim detected
+- ⚠️ Suspicious trading domain
+- ❌ Similarity to a known scam pattern
 
-Instead of saying:
+## From Detection to Action
 
-> "Let's just average these."
+ScamShield is designed around:
 
-we assign different weights according to reliability:
+**Detect → Verify → Explain → Protect**
 
-```text
-NLP                    × 0.20
-URL Analysis           × 0.15
-Web Reputation         × 0.15
-Official Verification  × 0.30
-Scam Pattern           × 0.20
-```
+Instead of simply telling a user that something is "dangerous", the system
+shows the evidence and helps them decide what to do next.
 
-Then:
+Possible actions include:
 
-[
-R =
-\frac{
-(0.20)(85)+(0.15)(75)+(0.15)(60)+(0.30)(95)+(0.20)(90)
-}{
-0.20+0.15+0.15+0.30+0.20
-}
-]
+**Verify · Avoid · Report**
 
-This produces a final risk score of **83.75/100**, so the system could classify it as **High Risk**.
+## Technology
 
-### But there's an important improvement
+- Python
+- NLP / AI
+- OCR
+- Web intelligence
+- Domain analysis
+- Risk scoring
+- Gemini API
+- [Add the actual frontend/backend technologies used here]
 
-I **wouldn't let this formula be the entire decision system**.
+## Why I Built It
 
-Suppose official verification returns:
+I built ScamShield India to explore how AI can be used for a problem that
+affects people outside the technology world.
 
-> **"Claimed SEBI adviser not found in official registration records."**
+The goal was not simply to classify text as a scam. I wanted to explore how
+different pieces of evidence could be brought together and explained in a
+way that a normal user could understand.
 
-That's much stronger evidence than merely seeing words like *"guaranteed returns."*
+## Future Ideas
 
-So ScamShield should use:
+- Browser extension for real-time warnings
+- Scam campaign detection through correlated indicators
+- Expanded official-source verification
+- Community reporting and scam intelligence
+- Improved image and social-media analysis
 
-**Weighted scoring + high-confidence rules**
+## Project Status
 
-```text
-                    Detection Signals
-                           ↓
-                  Individual Scores
-                           ↓
-              ┌─────────────────────┐
-              │  Weighted Evidence   │
-              │      Fusion          │
-              └──────────┬──────────┘
-                         ↓
-                   Base Risk Score
-                         ↓
-              High-Confidence Rules
-                         ↓
-                 Final Risk Score
-                         ↓
-             Low / Suspicious / High
-```
+This project was developed as part of a hackathon and is an ongoing
+learning project.
 
-For example, a **verified regulatory failure** could significantly increase the risk regardless of the NLP score.
+## What I Learned
 
-### How to explain this to an SIH judge
+Through this project, I explored:
 
-Don't say:
-
-> "We take the average confidence of different AI models."
-
-Say:
-
-> **"ScamShield uses weighted evidence fusion, where signals from NLP, URL analysis, web intelligence, official verification and scam-pattern matching are assigned different reliability weights. High-confidence evidence, such as failure of official entity verification, is additionally handled through rule-based checks. This produces an explainable risk score rather than relying on a single AI model."**
-
-That's technically much stronger and gives you a clear reason for having multiple detection methods.
+- Building a problem-focused AI application
+- Combining multiple sources of evidence
+- Working with APIs and external data
+- Designing explanations for non-technical users
+- Developing as part of a hackathon team
